@@ -55,7 +55,12 @@ void MainWindow::enumerateCommPorts()
         foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
         {
             ui->comPorts->addItem(info.portName() + (info.description().isEmpty() ? "" : " - " + info.description()));
+            #ifdef __linux__
+            availComPorts.append("/dev/" + info.portName());
+            #elif _WIN32
             availComPorts.append(info.portName());
+            #endif
+
         }
     }
 }
@@ -79,7 +84,7 @@ bool MainWindow::fileExists(QString path) {
 }
 
 bool MainWindow::isValid(){
-    if(!fileExists(QDir::currentPath() + "/esptool.exe"))
+    if(!fileExists(QDir::currentPath() + executive))
     {
         showWarning("No esptool.exe");
         return false;
@@ -119,7 +124,7 @@ void MainWindow::on_uploadBtn_clicked()
 
     QString cmd;
 
-    cmd = QDir::currentPath() + "/esptool.exe";
+    cmd = QDir::currentPath() + executive;
     cmd.append(" -cp " + availComPorts[ui->comPorts->currentIndex()]);
     cmd.append(" -cd " + ui->resetMethod->currentText());
     cmd.append(" -cb " + ui->baudRate->currentText());

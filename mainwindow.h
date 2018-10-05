@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
@@ -43,6 +43,13 @@ private:
     bool fileExists(QString path);
     void enumerateCommPorts();
     QStringList availComPorts;
+    #ifdef __linux__
+        QString executive = "/esptool";
+    #elif _WIN32
+        QString executive = "/esptool.exe";
+    #else
+    #error "OS not supported."
+    #endif
 };
 
 #endif // MAINWINDOW_H
